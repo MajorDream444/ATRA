@@ -1,0 +1,1184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ATRA — Sovereign Access Portal</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600&family=Space+Mono:wght@400;700&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    /* ── Variables ───────────────────────────────────────────────────── */
+    :root {
+      --gold:        #C9A84C;
+      --gold-bright: #E8C56A;
+      --gold-dim:    #8B7030;
+      --gold-trace:  rgba(201, 168, 76, 0.08);
+      --charcoal:    #0D0D0F;
+      --charcoal-1:  #111115;
+      --charcoal-2:  #16161C;
+      --charcoal-3:  #1E1E26;
+      --slate:       #2A2A35;
+      --mist:        rgba(255,255,255,0.04);
+      --text-bright: #F0EDE6;
+      --text-mid:    #9A9590;
+      --text-dim:    #5A5750;
+      --green-ok:    #2ECC71;
+      --red-alert:   #E74C3C;
+      --font-serif:  'Cormorant Garamond', Georgia, serif;
+      --font-mono:   'Space Mono', monospace;
+      --font-display:'Rajdhani', sans-serif;
+    }
+
+    /* ── Reset ───────────────────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--charcoal);
+      color: var(--text-bright);
+      font-family: var(--font-display);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ── Grain Overlay ───────────────────────────────────────────────── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 999;
+      opacity: 0.4;
+    }
+
+    /* ── Animated Mesh Background ────────────────────────────────────── */
+    .bg-mesh {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      background:
+        radial-gradient(ellipse 80% 50% at 20% 80%, rgba(201,168,76,0.04) 0%, transparent 60%),
+        radial-gradient(ellipse 60% 40% at 80% 20%, rgba(201,168,76,0.03) 0%, transparent 50%),
+        radial-gradient(ellipse 100% 80% at 50% 50%, rgba(13,13,15,0.9) 0%, var(--charcoal) 100%);
+    }
+
+    .bg-grid {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      background-image:
+        linear-gradient(rgba(201,168,76,0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(201,168,76,0.04) 1px, transparent 1px);
+      background-size: 60px 60px;
+      mask-image: radial-gradient(ellipse 100% 100% at 50% 50%, black 20%, transparent 80%);
+    }
+
+    /* ── Scrolling Ticker ────────────────────────────────────────────── */
+    .ticker-bar {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      height: 28px;
+      background: rgba(13,13,15,0.95);
+      border-bottom: 1px solid rgba(201,168,76,0.2);
+      z-index: 100;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+    }
+
+    .ticker-label {
+      background: var(--gold);
+      color: var(--charcoal);
+      font-family: var(--font-mono);
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.15em;
+      padding: 0 12px;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .ticker-track {
+      display: flex;
+      animation: ticker 30s linear infinite;
+      gap: 0;
+    }
+
+    .ticker-item {
+      font-family: var(--font-mono);
+      font-size: 9px;
+      color: var(--text-mid);
+      white-space: nowrap;
+      padding: 0 32px;
+    }
+
+    .ticker-item span {
+      color: var(--gold);
+      margin-left: 8px;
+    }
+
+    @keyframes ticker {
+      from { transform: translateX(0); }
+      to   { transform: translateX(-50%); }
+    }
+
+    /* ── Navigation ──────────────────────────────────────────────────── */
+    nav {
+      position: fixed;
+      top: 28px; left: 0; right: 0;
+      height: 64px;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 48px;
+      background: linear-gradient(to bottom, rgba(13,13,15,0.98), rgba(13,13,15,0.0));
+    }
+
+    .nav-logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .nav-logo-mark {
+      width: 32px;
+      height: 32px;
+      border: 1px solid var(--gold);
+      transform: rotate(45deg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+
+    .nav-logo-mark::after {
+      content: '';
+      position: absolute;
+      inset: 5px;
+      background: var(--gold);
+      transform: rotate(0deg);
+    }
+
+    .nav-logo-text {
+      font-family: var(--font-mono);
+      font-size: 13px;
+      letter-spacing: 0.3em;
+      color: var(--gold);
+    }
+
+    .nav-status {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+    }
+
+    .status-dot {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-family: var(--font-mono);
+      font-size: 9px;
+      letter-spacing: 0.15em;
+      color: var(--text-mid);
+    }
+
+    .status-dot::before {
+      content: '';
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--green-ok);
+      box-shadow: 0 0 8px var(--green-ok);
+      animation: pulse-green 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse-green {
+      0%, 100% { opacity: 1; box-shadow: 0 0 8px var(--green-ok); }
+      50%       { opacity: 0.6; box-shadow: 0 0 4px var(--green-ok); }
+    }
+
+    /* ── Main Layout ─────────────────────────────────────────────────── */
+    main {
+      position: relative;
+      z-index: 1;
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      padding-top: 92px;
+    }
+
+    /* ── Left Panel — Hero ───────────────────────────────────────────── */
+    .hero-panel {
+      padding: 80px 64px 80px 80px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      position: relative;
+    }
+
+    .hero-tag {
+      font-family: var(--font-mono);
+      font-size: 9px;
+      letter-spacing: 0.3em;
+      color: var(--gold-dim);
+      margin-bottom: 32px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .hero-tag::before {
+      content: '';
+      width: 32px;
+      height: 1px;
+      background: var(--gold-dim);
+    }
+
+    .hero-headline {
+      font-family: var(--font-serif);
+      font-size: clamp(44px, 5vw, 72px);
+      font-weight: 300;
+      line-height: 1.1;
+      letter-spacing: -0.02em;
+      margin-bottom: 24px;
+    }
+
+    .hero-headline em {
+      font-style: normal;
+      color: var(--gold);
+      font-weight: 500;
+    }
+
+    .hero-sub {
+      font-family: var(--font-display);
+      font-size: 15px;
+      font-weight: 300;
+      color: var(--text-mid);
+      line-height: 1.8;
+      max-width: 440px;
+      margin-bottom: 48px;
+      letter-spacing: 0.03em;
+    }
+
+    .hero-metrics {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 1px;
+      margin-bottom: 48px;
+      border: 1px solid rgba(201,168,76,0.12);
+    }
+
+    .metric-cell {
+      padding: 20px 16px;
+      background: var(--charcoal-2);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .metric-cell::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--gold), transparent);
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+
+    .metric-cell:hover::before { opacity: 1; }
+
+    .metric-val {
+      font-family: var(--font-mono);
+      font-size: 22px;
+      color: var(--gold-bright);
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    .metric-label {
+      font-family: var(--font-mono);
+      font-size: 8px;
+      letter-spacing: 0.2em;
+      color: var(--text-dim);
+      text-transform: uppercase;
+    }
+
+    .hero-esg-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      border: 1px solid rgba(46,204,113,0.3);
+      padding: 8px 16px;
+      background: rgba(46,204,113,0.05);
+    }
+
+    .esg-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--green-ok);
+      box-shadow: 0 0 10px var(--green-ok);
+    }
+
+    .esg-text {
+      font-family: var(--font-mono);
+      font-size: 9px;
+      letter-spacing: 0.2em;
+      color: var(--green-ok);
+    }
+
+    /* ── Right Panel — Gated Access ──────────────────────────────────── */
+    .access-panel {
+      padding: 80px 80px 80px 64px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      border-left: 1px solid rgba(201,168,76,0.1);
+      background: linear-gradient(135deg, var(--charcoal-1), var(--charcoal-2));
+      position: relative;
+    }
+
+    .access-panel::before {
+      content: '';
+      position: absolute;
+      top: 0; bottom: 0; left: 0;
+      width: 1px;
+      background: linear-gradient(to bottom, transparent, var(--gold) 30%, var(--gold) 70%, transparent);
+      opacity: 0.3;
+    }
+
+    .access-header {
+      margin-bottom: 40px;
+    }
+
+    .access-tag {
+      font-family: var(--font-mono);
+      font-size: 9px;
+      letter-spacing: 0.3em;
+      color: var(--gold-dim);
+      margin-bottom: 16px;
+    }
+
+    .access-title {
+      font-family: var(--font-serif);
+      font-size: 36px;
+      font-weight: 300;
+      letter-spacing: -0.01em;
+      line-height: 1.2;
+      margin-bottom: 8px;
+    }
+
+    .access-desc {
+      font-family: var(--font-display);
+      font-size: 13px;
+      color: var(--text-mid);
+      line-height: 1.7;
+      letter-spacing: 0.03em;
+    }
+
+    /* ── Form ────────────────────────────────────────────────────────── */
+    .access-form {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .form-group {
+      position: relative;
+    }
+
+    .form-label {
+      font-family: var(--font-mono);
+      font-size: 8px;
+      letter-spacing: 0.25em;
+      color: var(--text-dim);
+      display: block;
+      margin-bottom: 8px;
+    }
+
+    .form-input {
+      width: 100%;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(201,168,76,0.2);
+      color: var(--text-bright);
+      font-family: var(--font-mono);
+      font-size: 13px;
+      letter-spacing: 0.05em;
+      padding: 14px 16px;
+      outline: none;
+      transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
+    }
+
+    .form-input::placeholder {
+      color: var(--text-dim);
+      letter-spacing: 0.1em;
+    }
+
+    .form-input:focus {
+      border-color: var(--gold);
+      background: rgba(201,168,76,0.04);
+      box-shadow: 0 0 0 1px rgba(201,168,76,0.1), inset 0 0 20px rgba(201,168,76,0.02);
+    }
+
+    .form-input.key-input {
+      font-size: 15px;
+      letter-spacing: 0.25em;
+      text-align: center;
+      font-weight: 700;
+    }
+
+    .key-wrapper {
+      position: relative;
+    }
+
+    .key-prefix {
+      position: absolute;
+      left: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--gold-dim);
+      letter-spacing: 0.1em;
+      pointer-events: none;
+    }
+
+    .form-input.key-input {
+      padding-left: 100px;
+      text-align: left;
+    }
+
+    .form-divider {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin: 8px 0;
+    }
+
+    .form-divider::before,
+    .form-divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: rgba(201,168,76,0.1);
+    }
+
+    .form-divider span {
+      font-family: var(--font-mono);
+      font-size: 8px;
+      color: var(--text-dim);
+      letter-spacing: 0.2em;
+    }
+
+    /* ── CTA Button ──────────────────────────────────────────────────── */
+    .btn-sovereign {
+      position: relative;
+      width: 100%;
+      background: var(--gold);
+      color: var(--charcoal);
+      border: none;
+      font-family: var(--font-display);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      padding: 18px 32px;
+      cursor: pointer;
+      overflow: hidden;
+      transition: all 0.3s;
+      margin-top: 8px;
+    }
+
+    .btn-sovereign::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(255,255,255,0.1), transparent);
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+
+    .btn-sovereign:hover {
+      background: var(--gold-bright);
+      box-shadow: 0 0 30px rgba(201,168,76,0.3);
+      transform: translateY(-1px);
+    }
+
+    .btn-sovereign:hover::after { opacity: 1; }
+
+    .btn-secondary {
+      width: 100%;
+      background: transparent;
+      color: var(--gold);
+      border: 1px solid rgba(201,168,76,0.3);
+      font-family: var(--font-display);
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      padding: 14px 32px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .btn-secondary:hover {
+      border-color: var(--gold);
+      background: var(--gold-trace);
+    }
+
+    /* ── Security Notice ─────────────────────────────────────────────── */
+    .security-notice {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      margin-top: 24px;
+      padding: 16px;
+      background: var(--gold-trace);
+      border-left: 2px solid var(--gold-dim);
+    }
+
+    .security-icon {
+      color: var(--gold-dim);
+      font-size: 14px;
+      line-height: 1.5;
+      flex-shrink: 0;
+    }
+
+    .security-text {
+      font-family: var(--font-mono);
+      font-size: 9px;
+      letter-spacing: 0.1em;
+      color: var(--text-dim);
+      line-height: 1.8;
+    }
+
+    .security-text strong {
+      color: var(--text-mid);
+    }
+
+    /* ── Agent Status Bar ────────────────────────────────────────────── */
+    .agent-status-bar {
+      position: fixed;
+      bottom: 0; left: 0; right: 0;
+      height: 40px;
+      background: rgba(13,13,15,0.98);
+      border-top: 1px solid rgba(201,168,76,0.15);
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      padding: 0 48px;
+      gap: 32px;
+    }
+
+    .agent-chip {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-family: var(--font-mono);
+      font-size: 8px;
+      letter-spacing: 0.15em;
+      color: var(--text-dim);
+    }
+
+    .agent-chip-dot {
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: var(--green-ok);
+      box-shadow: 0 0 6px var(--green-ok);
+      animation: pulse-green 2s ease-in-out infinite;
+    }
+
+    .agent-chip-dot.orange {
+      background: #F39C12;
+      box-shadow: 0 0 6px #F39C12;
+    }
+
+    .status-divider {
+      width: 1px;
+      height: 16px;
+      background: rgba(201,168,76,0.12);
+    }
+
+    .agent-status-timestamp {
+      margin-left: auto;
+      font-family: var(--font-mono);
+      font-size: 8px;
+      color: var(--text-dim);
+      letter-spacing: 0.1em;
+    }
+
+    /* ── Decorative Corner Elements ──────────────────────────────────── */
+    .corner-tl, .corner-br {
+      position: absolute;
+      width: 24px;
+      height: 24px;
+      border-color: rgba(201,168,76,0.3);
+      border-style: solid;
+    }
+
+    .corner-tl { top: 20px; left: 20px; border-width: 1px 0 0 1px; }
+    .corner-br { bottom: 20px; right: 20px; border-width: 0 1px 1px 0; }
+
+    /* ── Loading States ───────────────────────────────────────────────── */
+    .scan-line {
+      position: absolute;
+      left: 0; right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--gold), transparent);
+      animation: scan 3s ease-in-out infinite;
+      opacity: 0.4;
+      pointer-events: none;
+    }
+
+    @keyframes scan {
+      0%   { top: 0; opacity: 0; }
+      10%  { opacity: 0.4; }
+      90%  { opacity: 0.4; }
+      100% { top: 100%; opacity: 0; }
+    }
+
+    /* ── Dashboard State (post-login) ────────────────────────────────── */
+    .dashboard {
+      display: none;
+      position: relative;
+      z-index: 10;
+      padding: 120px 80px 80px;
+      min-height: 100vh;
+    }
+
+    .dashboard.active { display: block; }
+    main.dashboard-mode { grid-template-columns: 1fr; }
+
+    .dashboard-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 48px;
+      padding-bottom: 24px;
+      border-bottom: 1px solid rgba(201,168,76,0.15);
+    }
+
+    .dashboard-title {
+      font-family: var(--font-serif);
+      font-size: 40px;
+      font-weight: 300;
+    }
+
+    .dashboard-buyer-id {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      letter-spacing: 0.2em;
+      color: var(--gold);
+    }
+
+    .pipeline-steps {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 1px;
+      margin-bottom: 48px;
+      border: 1px solid rgba(201,168,76,0.1);
+    }
+
+    .pipeline-step {
+      padding: 20px 16px;
+      background: var(--charcoal-2);
+      text-align: center;
+      position: relative;
+      transition: background 0.3s;
+    }
+
+    .pipeline-step.active { background: var(--charcoal-3); }
+    .pipeline-step.complete { background: rgba(201,168,76,0.05); }
+
+    .step-num {
+      font-family: var(--font-mono);
+      font-size: 22px;
+      color: var(--text-dim);
+      display: block;
+      margin-bottom: 6px;
+    }
+
+    .pipeline-step.active .step-num { color: var(--gold-bright); }
+    .pipeline-step.complete .step-num { color: var(--green-ok); }
+
+    .step-label {
+      font-family: var(--font-mono);
+      font-size: 7px;
+      letter-spacing: 0.15em;
+      color: var(--text-dim);
+      text-transform: uppercase;
+    }
+
+    .pipeline-step.active .step-label { color: var(--text-mid); }
+
+    .step-status {
+      font-size: 10px;
+      margin-top: 4px;
+    }
+
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 1px;
+      margin-bottom: 32px;
+    }
+
+    .dash-card {
+      background: var(--charcoal-2);
+      padding: 28px 24px;
+      border: 1px solid rgba(201,168,76,0.08);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .dash-card-label {
+      font-family: var(--font-mono);
+      font-size: 8px;
+      letter-spacing: 0.25em;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+
+    .dash-card-value {
+      font-family: var(--font-mono);
+      font-size: 28px;
+      color: var(--gold-bright);
+    }
+
+    .dash-card-sub {
+      font-family: var(--font-display);
+      font-size: 11px;
+      color: var(--text-mid);
+      margin-top: 6px;
+    }
+
+    /* ── Animations ──────────────────────────────────────────────────── */
+    @keyframes fade-up {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .hero-panel > * {
+      animation: fade-up 0.8s ease both;
+    }
+    .hero-panel > *:nth-child(1) { animation-delay: 0.1s; }
+    .hero-panel > *:nth-child(2) { animation-delay: 0.2s; }
+    .hero-panel > *:nth-child(3) { animation-delay: 0.3s; }
+    .hero-panel > *:nth-child(4) { animation-delay: 0.4s; }
+    .hero-panel > *:nth-child(5) { animation-delay: 0.5s; }
+
+    .access-panel > * {
+      animation: fade-up 0.8s ease both;
+    }
+    .access-panel > *:nth-child(1) { animation-delay: 0.3s; }
+    .access-panel > *:nth-child(2) { animation-delay: 0.4s; }
+    .access-panel > *:nth-child(3) { animation-delay: 0.5s; }
+
+    /* ── Responsive ──────────────────────────────────────────────────── */
+    @media (max-width: 900px) {
+      main { grid-template-columns: 1fr; }
+      .hero-panel { padding: 60px 40px; }
+      .access-panel { padding: 60px 40px; border-left: none; border-top: 1px solid rgba(201,168,76,0.1); }
+      nav { padding: 0 24px; }
+      .agent-status-bar { padding: 0 24px; gap: 16px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Backgrounds -->
+  <div class="bg-mesh"></div>
+  <div class="bg-grid"></div>
+
+  <!-- Ticker -->
+  <div class="ticker-bar">
+    <div class="ticker-label">LIVE INTEL</div>
+    <div style="overflow:hidden;flex:1;display:flex;">
+      <div class="ticker-track" id="ticker">
+        <span class="ticker-item">XAU/USD<span id="gold-price">$3,124.50</span></span>
+        <span class="ticker-item">PIPELINE STATUS<span>1–5 MT / MONTH · ACTIVE</span></span>
+        <span class="ticker-item">SENTINEL<span>ONLINE · SCANNING</span></span>
+        <span class="ticker-item">GREEN GOLD PROTOCOL<span>85% MERCURY-FREE CERTIFIED</span></span>
+        <span class="ticker-item">PORT OF NOUAKCHOTT<span>ZERO DELAYS · CLEAR</span></span>
+        <span class="ticker-item">BLACKLIST<span>0 ACTIVE THREATS</span></span>
+        <span class="ticker-item">VAULT<span>DUAL-STREAM · READY</span></span>
+        <span class="ticker-item">SETTLEMENT<span>TRAD-FI + USDT/BTC</span></span>
+        <!-- duplicate for seamless loop -->
+        <span class="ticker-item">XAU/USD<span id="gold-price2">$3,124.50</span></span>
+        <span class="ticker-item">PIPELINE STATUS<span>1–5 MT / MONTH · ACTIVE</span></span>
+        <span class="ticker-item">SENTINEL<span>ONLINE · SCANNING</span></span>
+        <span class="ticker-item">GREEN GOLD PROTOCOL<span>85% MERCURY-FREE CERTIFIED</span></span>
+        <span class="ticker-item">PORT OF NOUAKCHOTT<span>ZERO DELAYS · CLEAR</span></span>
+        <span class="ticker-item">BLACKLIST<span>0 ACTIVE THREATS</span></span>
+        <span class="ticker-item">VAULT<span>DUAL-STREAM · READY</span></span>
+        <span class="ticker-item">SETTLEMENT<span>TRAD-FI + USDT/BTC</span></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Navigation -->
+  <nav>
+    <div class="nav-logo">
+      <div class="nav-logo-mark"></div>
+      <span class="nav-logo-text">ATRA</span>
+    </div>
+    <div class="nav-status">
+      <div class="status-dot">SYSTEM · SECURE</div>
+      <div class="status-dot">SENTINEL · ACTIVE</div>
+    </div>
+  </nav>
+
+  <!-- MAIN — Landing State -->
+  <main id="main-landing">
+
+    <!-- Left: Hero -->
+    <section class="hero-panel">
+      <div class="corner-tl"></div>
+
+      <p class="hero-tag">PRIVATE BRIEFING · SOVEREIGN ALLOCATION</p>
+
+      <h1 class="hero-headline">
+        The Gateway to<br/>
+        <em>West African</em><br/>
+        Wealth
+      </h1>
+
+      <p class="hero-sub">
+        ATRA is not a broker. We are the architects of secure, high-volume,
+        ESG-compliant trade corridors — connecting African mineral wealth
+        to the global elite with absolute integrity and institutional authority.
+      </p>
+
+      <div class="hero-metrics">
+        <div class="metric-cell">
+          <span class="metric-val">5 MT</span>
+          <span class="metric-label">Monthly Pipeline</span>
+        </div>
+        <div class="metric-cell">
+          <span class="metric-val">85%</span>
+          <span class="metric-label">Mercury-Free Cert.</span>
+        </div>
+        <div class="metric-cell">
+          <span class="metric-val">6-Step</span>
+          <span class="metric-label">Secure-Close</span>
+        </div>
+      </div>
+
+      <div class="hero-esg-badge">
+        <div class="esg-dot"></div>
+        <span class="esg-text">GREEN GOLD PROTOCOL · ESG VERIFIED · MERCURY-FREE CERTIFIED</span>
+      </div>
+
+      <div class="corner-br"></div>
+    </section>
+
+    <!-- Right: Gated Access -->
+    <section class="access-panel">
+      <div class="scan-line"></div>
+
+      <div class="access-header">
+        <p class="access-tag">SOVEREIGN ACCESS PORTAL</p>
+        <h2 class="access-title">Request Private<br/>Allocation Briefing</h2>
+        <p class="access-desc">
+          Access is reserved for verified institutional buyers and sovereign partners.
+          Enter your Sovereign Access Key or submit a briefing request.
+        </p>
+      </div>
+
+      <div class="access-form" id="login-form">
+
+        <div class="form-group">
+          <label class="form-label" for="access-key">SOVEREIGN ACCESS KEY</label>
+          <div class="key-wrapper">
+            <span class="key-prefix">ATRA-SOV-</span>
+            <input
+              type="text"
+              id="access-key"
+              class="form-input key-input"
+              placeholder="2026-XXXXXXXX"
+              maxlength="20"
+              autocomplete="off"
+              spellcheck="false"
+            />
+          </div>
+        </div>
+
+        <button class="btn-sovereign" onclick="handleAccess()">
+          ⬡ &nbsp;&nbsp; ENTER SOVEREIGN PORTAL
+        </button>
+
+        <div class="form-divider"><span>OR REQUEST BRIEFING</span></div>
+
+        <div class="form-group">
+          <label class="form-label" for="entity-name">INSTITUTIONAL ENTITY NAME</label>
+          <input
+            type="text"
+            id="entity-name"
+            class="form-input"
+            placeholder="Legal entity name"
+            autocomplete="off"
+          />
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="contact-name">PRINCIPAL CONTACT</label>
+          <input
+            type="text"
+            id="contact-name"
+            class="form-input"
+            placeholder="Name and title"
+            autocomplete="off"
+          />
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="contact-email">SECURE EMAIL</label>
+          <input
+            type="email"
+            id="contact-email"
+            class="form-input"
+            placeholder="institutional@entity.com"
+            autocomplete="off"
+          />
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="volume">ALLOCATION INTEREST</label>
+          <select id="volume" class="form-input" style="appearance:none; cursor:pointer;">
+            <option value="" disabled selected>Select volume range</option>
+            <option value="trial">Trial Tranche — 50–500 kg</option>
+            <option value="1mt">1 MT / Month</option>
+            <option value="2-3mt">2–3 MT / Month</option>
+            <option value="5mt">Full Allocation — 5 MT / Month</option>
+          </select>
+        </div>
+
+        <button class="btn-secondary" onclick="handleRequest()">
+          REQUEST ALLOCATION BRIEFING
+        </button>
+
+        <div class="security-notice">
+          <span class="security-icon">⬡</span>
+          <p class="security-text">
+            <strong>CONFIDENTIALITY NOTICE:</strong> This portal is protected under NCNDA.
+            All interactions are encrypted and logged by Agent Sentinel.
+            Access Keys expire within 48 hours of issue.
+            Unauthorized access attempts are permanently logged and blocked.
+          </p>
+        </div>
+
+      </div>
+
+      <!-- Success State -->
+      <div id="request-success" style="display:none; text-align:center; padding: 40px 0;">
+        <div style="font-size: 40px; margin-bottom:16px;">⬡</div>
+        <p style="font-family:var(--font-mono); font-size:11px; letter-spacing:0.2em; color:var(--gold); margin-bottom:12px;">REQUEST RECEIVED</p>
+        <p style="font-family:var(--font-display); font-size:14px; color:var(--text-mid); line-height:1.8;">
+          Your briefing request has been logged by Agent Sentinel.<br/>
+          M. Diallo will contact you within 24 hours with verification instructions.
+        </p>
+        <div style="margin-top:24px; padding:16px; background:var(--gold-trace); border-left:2px solid var(--gold-dim);">
+          <p style="font-family:var(--font-mono); font-size:9px; letter-spacing:0.15em; color:var(--text-mid);">
+            REF: ATRA-RFP-<span id="ref-number"></span>
+          </p>
+        </div>
+      </div>
+
+    </section>
+  </main>
+
+  <!-- DASHBOARD (post-login) -->
+  <div class="dashboard" id="dashboard">
+    <div class="dashboard-header">
+      <div>
+        <h2 class="dashboard-title">Sovereign Allocation<br/>Briefing</h2>
+      </div>
+      <div style="text-align:right;">
+        <div class="dashboard-buyer-id" id="dash-buyer-id">SOV-XXXX</div>
+        <div style="font-family:var(--font-mono);font-size:9px;color:var(--text-dim);margin-top:4px;letter-spacing:0.15em;">SENTINEL CLEARED · RISK: LOW</div>
+      </div>
+    </div>
+
+    <!-- 6-Step Pipeline Tracker -->
+    <div class="pipeline-steps">
+      <div class="pipeline-step complete">
+        <span class="step-num">01</span>
+        <div class="step-label">Consultation</div>
+        <div class="step-status">✅</div>
+      </div>
+      <div class="pipeline-step complete">
+        <span class="step-num">02</span>
+        <div class="step-label">Verification</div>
+        <div class="step-status">✅</div>
+      </div>
+      <div class="pipeline-step active">
+        <span class="step-num">03</span>
+        <div class="step-label">Negotiation</div>
+        <div class="step-status">⟳</div>
+      </div>
+      <div class="pipeline-step">
+        <span class="step-num">04</span>
+        <div class="step-label">Documentation</div>
+        <div class="step-status">—</div>
+      </div>
+      <div class="pipeline-step">
+        <span class="step-num">05</span>
+        <div class="step-label">Payment</div>
+        <div class="step-status">—</div>
+      </div>
+      <div class="pipeline-step">
+        <span class="step-num">06</span>
+        <div class="step-label">Logistics</div>
+        <div class="step-status">—</div>
+      </div>
+    </div>
+
+    <div class="dashboard-grid">
+      <div class="dash-card">
+        <div class="dash-card-label">Current Allocation Available</div>
+        <div class="dash-card-value">2.5 MT</div>
+        <div class="dash-card-sub">Green Gold Stream — Mali/Burkina Faso Interior</div>
+      </div>
+      <div class="dash-card">
+        <div class="dash-card-label">ESG Certification Status</div>
+        <div class="dash-card-value" style="color:var(--green-ok); font-size:20px;">CERTIFIED</div>
+        <div class="dash-card-sub">Mercury: 0.0% · Fair Wage: 100% · Protocol v4.2</div>
+      </div>
+      <div class="dash-card">
+        <div class="dash-card-label">Blacklist Clearance</div>
+        <div class="dash-card-value" style="color:var(--green-ok); font-size:20px;">CLEAR</div>
+        <div class="dash-card-sub">0 matches · Sentinel v4.2 · <span id="clear-time"></span></div>
+      </div>
+    </div>
+
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:1px; border:1px solid rgba(201,168,76,0.1);">
+      <div class="dash-card">
+        <div class="dash-card-label">Traditional Settlement</div>
+        <div style="font-family:var(--font-mono);font-size:12px;color:var(--text-mid);line-height:2;margin-top:8px;">
+          <div>◦ Irrevocable DLC (MT700/MT760)</div>
+          <div>◦ Bank-to-Bank MT103</div>
+          <div>◦ Third-Party Escrow</div>
+          <div>◦ Bank Guarantee / SBLC</div>
+        </div>
+      </div>
+      <div class="dash-card">
+        <div class="dash-card-label">Digital Settlement</div>
+        <div style="font-family:var(--font-mono);font-size:12px;color:var(--text-mid);line-height:2;margin-top:8px;">
+          <div>◦ USDT (ERC-20 / TRC-20)</div>
+          <div>◦ BTC (Native)</div>
+          <div>◦ Multi-Sig Escrow</div>
+          <div>◦ Near-Instant Finality</div>
+        </div>
+      </div>
+    </div>
+
+    <div style="margin-top:32px; text-align:center;">
+      <p style="font-family:var(--font-mono);font-size:9px;letter-spacing:0.2em;color:var(--text-dim);">
+        FOR FULL BRIEFING CONTACT: M. DIALLO · m.diallo@atrasarl.com · +222-44290990
+      </p>
+    </div>
+  </div>
+
+  <!-- Agent Status Bar -->
+  <div class="agent-status-bar">
+    <div class="agent-chip"><div class="agent-chip-dot"></div>SENTINEL</div>
+    <div class="status-divider"></div>
+    <div class="agent-chip"><div class="agent-chip-dot"></div>ALCHEMIST</div>
+    <div class="status-divider"></div>
+    <div class="agent-chip"><div class="agent-chip-dot"></div>LOGOS</div>
+    <div class="status-divider"></div>
+    <div class="agent-chip"><div class="agent-chip-dot"></div>VAULT</div>
+    <div class="status-divider"></div>
+    <div class="agent-chip"><div class="agent-chip-dot orange"></div>NAVIGATOR</div>
+    <div class="agent-status-timestamp" id="live-time"></div>
+  </div>
+
+  <script>
+    // Live clock
+    function updateTime() {
+      const now = new Date();
+      const s = now.toISOString().replace('T', ' · ').substring(0, 22) + ' UTC';
+      document.getElementById('live-time').textContent = s;
+    }
+    updateTime();
+    setInterval(updateTime, 1000);
+
+    // Gold price simulator
+    let basePrice = 3124.50;
+    function updatePrice() {
+      basePrice += (Math.random() - 0.48) * 0.8;
+      const formatted = '$' + basePrice.toFixed(2);
+      document.getElementById('gold-price').textContent = formatted;
+      document.getElementById('gold-price2').textContent = formatted;
+    }
+    setInterval(updatePrice, 4000);
+
+    // Set clear time
+    document.getElementById('clear-time').textContent = new Date().toISOString().substring(11,16) + ' UTC';
+
+    // Handle sovereign key access
+    function handleAccess() {
+      const key = document.getElementById('access-key').value.trim();
+      if (!key) {
+        shake(document.getElementById('access-key'));
+        return;
+      }
+
+      const btn = document.querySelector('.btn-sovereign');
+      btn.textContent = '⟳  SENTINEL VERIFYING...';
+      btn.style.opacity = '0.7';
+
+      setTimeout(() => {
+        // Transition to dashboard
+        document.getElementById('main-landing').style.display = 'none';
+        document.getElementById('dashboard').classList.add('active');
+
+        // Set buyer ID from key
+        const buyerId = 'SOV-' + key.toUpperCase().substring(0, 8).replace(/-/g, '').substring(0, 6);
+        document.getElementById('dash-buyer-id').textContent = buyerId;
+      }, 2200);
+    }
+
+    // Handle briefing request
+    function handleRequest() {
+      const entity = document.getElementById('entity-name').value.trim();
+      const email = document.getElementById('contact-email').value.trim();
+      if (!entity || !email) {
+        if (!entity) shake(document.getElementById('entity-name'));
+        if (!email) shake(document.getElementById('contact-email'));
+        return;
+      }
+
+      document.getElementById('login-form').style.display = 'none';
+      document.getElementById('request-success').style.display = 'block';
+
+      const refNum = 'RFP-' + Date.now().toString(36).toUpperCase().substring(3);
+      document.getElementById('ref-number').textContent = refNum;
+    }
+
+    // Shake animation for validation
+    function shake(el) {
+      el.style.animation = 'none';
+      el.style.borderColor = 'var(--red-alert)';
+      el.style.boxShadow = '0 0 0 1px rgba(231,76,60,0.3)';
+      setTimeout(() => {
+        el.style.borderColor = '';
+        el.style.boxShadow = '';
+      }, 1500);
+    }
+
+    // Enter key on access input
+    document.getElementById('access-key').addEventListener('keydown', e => {
+      if (e.key === 'Enter') handleAccess();
+    });
+  </script>
+
+</body>
+</html>

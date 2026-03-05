@@ -1,0 +1,20 @@
+{
+  "_metadata": {
+    "description": "ATRA Proprietary Industry Blacklist — Hashed Entity Identifiers",
+    "version": "1.0.0",
+    "last_updated": "2026-03-05",
+    "classification": "CONFIDENTIAL — ATRA INTERNAL USE ONLY",
+    "format": "SHA-256 hashes of entity_name.strip().lower() and registration numbers",
+    "note": "Clear-text entity names are NEVER stored in this file. Use scripts/hash_entity.py to add entries.",
+    "access_control": "Sentinel Agent read-only. Write access: ATRA Principal only.",
+    "total_entries": 0
+  },
+  "hashed_entities": [
+    "PLACEHOLDER_REPLACE_WITH_SHA256_HASH_OF_ENTITY_NAME"
+  ],
+  "_instructions": {
+    "to_add_entry": "Run: python scripts/hash_entity.py --entity 'Entity Name' --reg 'REG-NUMBER'",
+    "to_verify": "Run: python backend/core/sentinel_vetting.py --buyer-id TEST-001 --entity 'Entity Name' --demo",
+    "warning": "Never commit clear-text names of blacklisted entities to version control"
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "agent": "Sentinel",
+  "version": "1.0.0",
+  "buyer_id": "SOV-HK-9214",
+  "timestamp": "2026-03-05T13:17:54.638592Z",
+  "blacklist": {
+    "entity_hash": "8e35dd829b3111a4...",
+    "blacklist_status": "CLEAR",
+    "flag_reason": null
+  },
+  "proof_of_funds": {
+    "pof_status": "CONFIRMED",
+    "instrument": "BCL",
+    "bank_tier": "Tier-1",
+    "liquidity_ratio": 1.35,
+    "issues": []
+  },
+  "kyc_aml": {
+    "kyc_status": "VERIFIED",
+    "missing_documents": [],
+    "sanctions_check": "CLEAR",
+    "pep_check": "CLEAR"
+  },
+  "risk_level": "LOW",
+  "recommendation": "ADVANCE_TO_LOGOS",
+  "sentinel_hash": "SENTINEL_CLEAR_SOV_HK_9214_ALPHA"
+}
