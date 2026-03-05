@@ -1,0 +1,1409 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ATRA — Africa Trade & Resources Agency</title>
+  <meta name="description" content="Institutional-grade West African commodity trade. Green Gold Protocol. 1–5 MT monthly pipeline. Dual-stream settlement."/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Space+Mono:wght@400;700&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --gold:        #C9A84C;
+      --gold-bright: #E8C56A;
+      --gold-dim:    #8B7030;
+      --gold-trace:  rgba(201,168,76,0.07);
+      --gold-line:   rgba(201,168,76,0.15);
+      --charcoal:    #0A0A0C;
+      --charcoal-1:  #0E0E12;
+      --charcoal-2:  #141418;
+      --charcoal-3:  #1C1C22;
+      --text-bright: #F2EEE6;
+      --text-mid:    #9A9590;
+      --text-dim:    #52504C;
+      --green:       #27AE60;
+      --green-glow:  rgba(39,174,96,0.15);
+      --red:         #C0392B;
+      --serif:       'Cormorant Garamond', Georgia, serif;
+      --mono:        'Space Mono', monospace;
+      --sans:        'Rajdhani', sans-serif;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--charcoal);
+      color: var(--text-bright);
+      font-family: var(--sans);
+      overflow-x: hidden;
+    }
+
+    /* ── Noise Grain ─────────────────────────────────────────── */
+    body::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.025'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 9999;
+    }
+
+    /* ── Ticker ──────────────────────────────────────────────── */
+    .ticker {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      height: 26px;
+      background: rgba(10,10,12,0.97);
+      border-bottom: 1px solid var(--gold-line);
+      z-index: 200;
+      display: flex;
+      align-items: center;
+      overflow: hidden;
+    }
+    .ticker-badge {
+      background: var(--gold);
+      color: var(--charcoal);
+      font-family: var(--mono);
+      font-size: 8px;
+      font-weight: 700;
+      letter-spacing: 0.2em;
+      padding: 0 14px;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      flex-shrink: 0;
+    }
+    .ticker-scroll {
+      display: flex;
+      animation: scroll 35s linear infinite;
+      white-space: nowrap;
+    }
+    .ticker-item {
+      font-family: var(--mono);
+      font-size: 8px;
+      color: var(--text-dim);
+      padding: 0 28px;
+      letter-spacing: 0.1em;
+    }
+    .ticker-item b { color: var(--gold); font-weight: 400; margin-left: 6px; }
+    @keyframes scroll { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+    /* ── Nav ─────────────────────────────────────────────────── */
+    nav {
+      position: fixed;
+      top: 26px; left: 0; right: 0;
+      height: 68px;
+      z-index: 200;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 60px;
+      background: linear-gradient(to bottom, rgba(10,10,12,0.98) 60%, transparent);
+      transition: background 0.3s;
+    }
+    .nav-logo {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      text-decoration: none;
+    }
+    .logo-diamond {
+      position: relative;
+      width: 28px; height: 28px;
+    }
+    .logo-diamond::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border: 1px solid var(--gold);
+      transform: rotate(45deg);
+    }
+    .logo-diamond::after {
+      content: '';
+      position: absolute;
+      inset: 7px;
+      background: var(--gold);
+      transform: rotate(45deg);
+    }
+    .logo-text {
+      font-family: var(--mono);
+      font-size: 14px;
+      letter-spacing: 0.35em;
+      color: var(--gold);
+    }
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 36px;
+      list-style: none;
+    }
+    .nav-links a {
+      font-family: var(--mono);
+      font-size: 9px;
+      letter-spacing: 0.2em;
+      color: var(--text-mid);
+      text-decoration: none;
+      text-transform: uppercase;
+      transition: color 0.2s;
+    }
+    .nav-links a:hover { color: var(--gold); }
+    .nav-cta {
+      background: transparent;
+      border: 1px solid var(--gold-line);
+      color: var(--gold) !important;
+      padding: 8px 20px !important;
+      transition: all 0.2s !important;
+    }
+    .nav-cta:hover {
+      background: var(--gold-trace) !important;
+      border-color: var(--gold) !important;
+    }
+
+    /* ── Hero ────────────────────────────────────────────────── */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 140px 60px 100px;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero-bg {
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 70% 60% at 15% 85%, rgba(201,168,76,0.05) 0%, transparent 55%),
+        radial-gradient(ellipse 50% 50% at 85% 15%, rgba(201,168,76,0.04) 0%, transparent 50%);
+    }
+    .hero-grid {
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(var(--gold-line) 1px, transparent 1px),
+        linear-gradient(90deg, var(--gold-line) 1px, transparent 1px);
+      background-size: 80px 80px;
+      opacity: 0.3;
+      mask-image: radial-gradient(ellipse 80% 70% at 50% 80%, black, transparent);
+    }
+    .hero-tag {
+      font-family: var(--mono);
+      font-size: 9px;
+      letter-spacing: 0.35em;
+      color: var(--gold-dim);
+      margin-bottom: 32px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      position: relative;
+      z-index: 1;
+    }
+    .hero-tag::before { content: ''; width: 40px; height: 1px; background: var(--gold-dim); }
+    .hero-h1 {
+      font-family: var(--serif);
+      font-size: clamp(52px, 7vw, 96px);
+      font-weight: 300;
+      line-height: 1.0;
+      letter-spacing: -0.02em;
+      max-width: 900px;
+      margin-bottom: 32px;
+      position: relative;
+      z-index: 1;
+    }
+    .hero-h1 em {
+      font-style: italic;
+      color: var(--gold);
+    }
+    .hero-sub {
+      font-family: var(--sans);
+      font-size: 17px;
+      font-weight: 300;
+      color: var(--text-mid);
+      max-width: 560px;
+      line-height: 1.9;
+      margin-bottom: 56px;
+      letter-spacing: 0.03em;
+      position: relative;
+      z-index: 1;
+    }
+    .hero-actions {
+      display: flex;
+      gap: 16px;
+      position: relative;
+      z-index: 1;
+      flex-wrap: wrap;
+    }
+    .btn-primary {
+      background: var(--gold);
+      color: var(--charcoal);
+      border: none;
+      font-family: var(--sans);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      padding: 18px 40px;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      transition: all 0.25s;
+      position: relative;
+      overflow: hidden;
+    }
+    .btn-primary:hover {
+      background: var(--gold-bright);
+      box-shadow: 0 0 40px rgba(201,168,76,0.25);
+      transform: translateY(-2px);
+    }
+    .btn-outline {
+      background: transparent;
+      color: var(--text-mid);
+      border: 1px solid rgba(255,255,255,0.1);
+      font-family: var(--sans);
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      padding: 18px 36px;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      transition: all 0.25s;
+    }
+    .btn-outline:hover {
+      border-color: var(--gold-line);
+      color: var(--gold);
+    }
+    .hero-scroll {
+      position: absolute;
+      bottom: 40px;
+      left: 60px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-family: var(--mono);
+      font-size: 8px;
+      letter-spacing: 0.2em;
+      color: var(--text-dim);
+      z-index: 1;
+    }
+    .scroll-line {
+      width: 1px;
+      height: 48px;
+      background: linear-gradient(to bottom, var(--gold-dim), transparent);
+      animation: scroll-pulse 2s ease-in-out infinite;
+    }
+    @keyframes scroll-pulse {
+      0%, 100% { opacity: 0.4; height: 48px; }
+      50% { opacity: 1; height: 32px; }
+    }
+
+    /* ── Stats Bar ───────────────────────────────────────────── */
+    .stats-bar {
+      border-top: 1px solid var(--gold-line);
+      border-bottom: 1px solid var(--gold-line);
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      background: var(--charcoal-1);
+    }
+    .stat-cell {
+      padding: 36px 48px;
+      border-right: 1px solid var(--gold-line);
+      position: relative;
+      overflow: hidden;
+      transition: background 0.3s;
+    }
+    .stat-cell:last-child { border-right: none; }
+    .stat-cell:hover { background: var(--gold-trace); }
+    .stat-cell::after {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--gold), transparent);
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    .stat-cell:hover::after { opacity: 1; }
+    .stat-num {
+      font-family: var(--serif);
+      font-size: 48px;
+      font-weight: 300;
+      color: var(--gold-bright);
+      line-height: 1;
+      margin-bottom: 6px;
+    }
+    .stat-unit {
+      font-size: 20px;
+      color: var(--gold-dim);
+    }
+    .stat-label {
+      font-family: var(--mono);
+      font-size: 8px;
+      letter-spacing: 0.2em;
+      color: var(--text-dim);
+      text-transform: uppercase;
+    }
+
+    /* ── Section Shared ──────────────────────────────────────── */
+    section { position: relative; overflow: hidden; }
+    .section-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 120px 60px;
+    }
+    .section-tag {
+      font-family: var(--mono);
+      font-size: 8px;
+      letter-spacing: 0.35em;
+      color: var(--gold-dim);
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .section-tag::before { content: ''; width: 32px; height: 1px; background: var(--gold-dim); }
+    .section-h2 {
+      font-family: var(--serif);
+      font-size: clamp(36px, 4vw, 60px);
+      font-weight: 300;
+      line-height: 1.15;
+      letter-spacing: -0.01em;
+      margin-bottom: 24px;
+    }
+    .section-h2 em { font-style: italic; color: var(--gold); }
+    .section-lead {
+      font-family: var(--sans);
+      font-size: 16px;
+      font-weight: 300;
+      color: var(--text-mid);
+      max-width: 600px;
+      line-height: 1.9;
+      letter-spacing: 0.03em;
+    }
+
+    /* ── Problem Section ─────────────────────────────────────── */
+    .problem { background: var(--charcoal-1); }
+    .problem-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 80px;
+      margin-top: 72px;
+      align-items: center;
+    }
+    .problem-list {
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+    }
+    .problem-item {
+      padding: 24px 28px;
+      background: var(--charcoal-2);
+      border-left: 2px solid var(--red);
+      display: flex;
+      gap: 20px;
+      align-items: flex-start;
+      transition: background 0.2s;
+    }
+    .problem-item:hover { background: var(--charcoal-3); }
+    .problem-icon {
+      font-size: 18px;
+      margin-top: 2px;
+      flex-shrink: 0;
+    }
+    .problem-text h4 {
+      font-family: var(--sans);
+      font-size: 14px;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      margin-bottom: 4px;
+    }
+    .problem-text p {
+      font-family: var(--sans);
+      font-size: 13px;
+      color: var(--text-mid);
+      line-height: 1.7;
+    }
+    .solution-box {
+      background: var(--charcoal-3);
+      border: 1px solid var(--gold-line);
+      padding: 48px 40px;
+      position: relative;
+    }
+    .solution-box::before {
+      content: 'THE ATRA SOLUTION';
+      position: absolute;
+      top: -1px; left: 32px;
+      background: var(--gold);
+      color: var(--charcoal);
+      font-family: var(--mono);
+      font-size: 8px;
+      letter-spacing: 0.2em;
+      padding: 4px 12px;
+    }
+    .solution-box h3 {
+      font-family: var(--serif);
+      font-size: 32px;
+      font-weight: 300;
+      margin-bottom: 20px;
+      line-height: 1.3;
+    }
+    .solution-box p {
+      font-size: 14px;
+      color: var(--text-mid);
+      line-height: 1.9;
+      margin-bottom: 28px;
+    }
+    .solution-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .tag {
+      font-family: var(--mono);
+      font-size: 8px;
+      letter-spacing: 0.15em;
+      padding: 6px 12px;
+      border: 1px solid var(--gold-line);
+      color: var(--gold-dim);
+    }
+
+    /* ── Green Gold Section ──────────────────────────────────── */
+    .green-gold { background: var(--charcoal); }
+    .gg-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 80px;
+      margin-top: 72px;
+      align-items: start;
+    }
+    .gg-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      border: 1px solid rgba(39,174,96,0.3);
+      background: var(--green-glow);
+      padding: 10px 20px;
+      margin-bottom: 32px;
+    }
+    .gg-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: var(--green);
+      box-shadow: 0 0 12px var(--green);
+      animation: glow 2s ease-in-out infinite;
+    }
+    @keyframes glow {
+      0%, 100% { box-shadow: 0 0 8px var(--green); }
+      50% { box-shadow: 0 0 20px var(--green); }
+    }
+    .gg-badge span {
+      font-family: var(--mono);
+      font-size: 9px;
+      letter-spacing: 0.2em;
+      color: var(--green);
+    }
+    .stream-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 32px;
+    }
+    .stream-table th {
+      font-family: var(--mono);
+      font-size: 8px;
+      letter-spacing: 0.2em;
+      color: var(--text-dim);
+      text-align: left;
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--gold-line);
+    }
+    .stream-table td {
+      font-family: var(--sans);
+      font-size: 13px;
+      color: var(--text-mid);
+      padding: 16px;
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+    }
+    .stream-table tr:hover td { background: var(--gold-trace); }
+    .badge-green {
+      background: var(--green-glow);
+      color: var(--green);
+      font-family: var(--mono);
+      font-size: 8px;
+      letter-spacing: 0.1em;
+      padding: 3px 8px;
+      border: 1px solid rgba(39,174,96,0.2);
+    }
+    .badge-gold {
+      background: var(--gold-trace);
+      color: var(--gold);
+      font-family: var(--mono);
+      font-size: 8px;
+      letter-spacing: 0.1em;
+      padding: 3px 8px;
+      border: 1px solid var(--gold-line);
+    }
+    .gg-metrics {
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+    }
+    .gg-metric {
+      background: var(--charcoal-2);
+      padding: 28px 32px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: background 0.2s;
+    }
+    .gg-metric:hover { background: var(--charcoal-3); }
+    .gg-metric-label {
+      font-family: var(--mono);
+      font-size: 9px;
+      letter-spacing: 0.15em;
+      color: var(--text-dim);
+    }
+    .gg-metric-val {
+      font-family: var(--serif);
+      font-size: 28px;
+      color: var(--green);
+    }
+
+    /* ── Process Section ─────────────────────────────────────── */
+    .process { background: var(--charcoal-1); }
+    .steps-grid {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 1px;
+      margin-top: 64px;
+      border: 1px solid var(--gold-line);
+    }
+    .step-card {
+      background: var(--charcoal-2);
+      padding: 32px 24px;
+      position: relative;
+      transition: background 0.3s;
+    }
+    .step-card:hover { background: var(--charcoal-3); }
+    .step-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, var(--gold), transparent);
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    .step-card:hover::before { opacity: 1; }
+    .step-n {
+      font-family: var(--serif);
+      font-size: 52px;
+      font-weight: 300;
+      color: rgba(201,168,76,0.15);
+      line-height: 1;
+      margin-bottom: 16px;
+    }
+    .step-title {
+      font-family: var(--sans);
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      margin-bottom: 10px;
+      color: var(--text-bright);
+    }
+    .step-desc {
+      font-family: var(--sans);
+      font-size: 12px;
+      color: var(--text-dim);
+      line-height: 1.7;
+    }
+    .step-agent {
+      margin-top: 16px;
+      font-family: var(--mono);
+      font-size: 8px;
+      letter-spacing: 0.15em;
+      color: var(--gold-dim);
+    }
+
+    /* ── Audiences Section ───────────────────────────────────── */
+    .audiences { background: var(--charcoal); }
+    .audience-tabs {
+      display: flex;
+      gap: 1px;
+      margin-top: 56px;
+      margin-bottom: 1px;
+    }
+    .aud-tab {
+      flex: 1;
+      padding: 20px 24px;
+      background: var(--charcoal-2);
+      border: none;
+      cursor: pointer;
+      text-align: left;
+      border-bottom: 2px solid transparent;
+      transition: all 0.2s;
+    }
+    .aud-tab.active {
+      background: var(--charcoal-3);
+      border-bottom-color: var(--gold);
+    }
+    .aud-tab-region {
+      font-family: var(--mono);
+      font-size: 8px;
+      letter-spacing: 0.2em;
+      color: var(--text-dim);
+      margin-bottom: 6px;
+    }
+    .aud-tab-title {
+      font-family: var(--sans);
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-mid);
+      transition: color 0.2s;
+    }
+    .aud-tab.active .aud-tab-title { color: var(--gold); }
+    .audience-panels { border: 1px solid var(--gold-line); }
+    .aud-panel {
+      display: none;
+      grid-template-columns: 1fr 1fr;
+      gap: 0;
+    }
+    .aud-panel.active { display: grid; }
+    .aud-content {
+      padding: 48px 48px;
+      background: var(--charcoal-2);
+    }
+    .aud-hook {
+      font-family: var(--serif);
+      font-size: 28px;
+      font-weight: 300;
+      line-height: 1.4;
+      margin-bottom: 20px;
+    }
+    .aud-hook em { font-style: italic; color: var(--gold); }
+    .aud-body {
+      font-size: 14px;
+      color: var(--text-mid);
+      line-height: 1.9;
+      margin-bottom: 32px;
+    }
+    .aud-points {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .aud-points li {
+      font-family: var(--mono);
+      font-size: 11px;
+      letter-spacing: 0.05em;
+      color: var(--text-mid);
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+    }
+    .aud-points li::before {
+      content: '◦';
+      color: var(--gold);
+      flex-shrink: 0;
+    }
+    .aud-visual {
+      background: var(--charcoal-3);
+      padding: 48px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 16px;
+      border-left: 1px solid var(--gold-line);
+    }
+    .aud-stat-big {
+      font-family: var(--serif);
+      font-size: 64px;
+      font-weight: 300;
+      color: var(--gold-bright);
+      line-height: 1;
+    }
+    .aud-stat-label {
+      font-family: var(--mono);
+      font-size: 9px;
+      letter-spacing: 0.2em;
+      color: var(--text-dim);
+      margin-bottom: 24px;
+    }
+
+    /* ── Settlement Section ──────────────────────────────────── */
+    .settlement { background: var(--charcoal-1); }
+    .settle-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1px;
+      margin-top: 64px;
+      border: 1px solid var(--gold-line);
+    }
+    .settle-card {
+      background: var(--charcoal-2);
+      padding: 48px 40px;
+      transition: background 0.3s;
+    }
+    .settle-card:hover { background: var(--charcoal-3); }
+    .settle-type {
+      font-family: var(--mono);
+      font-size: 8px;
+      letter-spacing: 0.3em;
+      color: var(--gold-dim);
+      margin-bottom: 16px;
+    }
+    .settle-title {
+      font-family: var(--serif);
+      font-size: 32px;
+      font-weight: 300;
+      margin-bottom: 20px;
+      line-height: 1.2;
+    }
+    .settle-items {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .settle-items li {
+      font-family: var(--mono);
+      font-size: 11px;
+      letter-spacing: 0.05em;
+      color: var(--text-mid);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+    }
+    .settle-items li:last-child { border-bottom: none; }
+    .settle-dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--gold);
+      flex-shrink: 0;
+    }
+
+    /* ── CTA Section ─────────────────────────────────────────── */
+    .cta-section {
+      background: var(--charcoal);
+      position: relative;
+      overflow: hidden;
+    }
+    .cta-section::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse 80% 60% at 50% 50%, rgba(201,168,76,0.05), transparent);
+    }
+    .cta-inner {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 140px 60px;
+      text-align: center;
+      position: relative;
+      z-index: 1;
+    }
+    .cta-inner .section-tag { justify-content: center; }
+    .cta-inner .section-tag::before { display: none; }
+    .cta-h2 {
+      font-family: var(--serif);
+      font-size: clamp(40px, 5vw, 72px);
+      font-weight: 300;
+      line-height: 1.15;
+      margin-bottom: 24px;
+    }
+    .cta-h2 em { font-style: italic; color: var(--gold); }
+    .cta-sub {
+      font-size: 16px;
+      color: var(--text-mid);
+      line-height: 1.9;
+      margin-bottom: 56px;
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .cta-buttons {
+      display: flex;
+      gap: 16px;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-bottom: 56px;
+    }
+    .cta-contact {
+      font-family: var(--mono);
+      font-size: 9px;
+      letter-spacing: 0.15em;
+      color: var(--text-dim);
+      line-height: 2.2;
+    }
+    .cta-contact a {
+      color: var(--gold-dim);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+    .cta-contact a:hover { color: var(--gold); }
+
+    /* ── Footer ──────────────────────────────────────────────── */
+    footer {
+      border-top: 1px solid var(--gold-line);
+      background: var(--charcoal-1);
+      padding: 40px 60px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .footer-logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .footer-copy {
+      font-family: var(--mono);
+      font-size: 8px;
+      letter-spacing: 0.15em;
+      color: var(--text-dim);
+    }
+    .footer-tagline {
+      font-family: var(--serif);
+      font-size: 13px;
+      font-style: italic;
+      color: var(--text-dim);
+    }
+
+    /* ── Animations ──────────────────────────────────────────── */
+    .fade-up {
+      opacity: 0;
+      transform: translateY(30px);
+      transition: opacity 0.8s ease, transform 0.8s ease;
+    }
+    .fade-up.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* ── Responsive ──────────────────────────────────────────── */
+    @media (max-width: 900px) {
+      .hero { padding: 120px 32px 80px; }
+      nav { padding: 0 32px; }
+      .nav-links { display: none; }
+      .section-inner { padding: 80px 32px; }
+      .stats-bar { grid-template-columns: 1fr 1fr; }
+      .problem-grid, .gg-grid, .aud-panel { grid-template-columns: 1fr; }
+      .steps-grid { grid-template-columns: 1fr 1fr; }
+      .settle-grid { grid-template-columns: 1fr; }
+      footer { flex-direction: column; gap: 16px; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Ticker -->
+<div class="ticker">
+  <div class="ticker-badge">LIVE</div>
+  <div style="overflow:hidden;flex:1;display:flex;">
+    <div class="ticker-scroll">
+      <span class="ticker-item">XAU/USD<b id="xau">$3,124.50</b></span>
+      <span class="ticker-item">PIPELINE<b>1–5 MT / MONTH · ACTIVE</b></span>
+      <span class="ticker-item">GREEN GOLD<b>85% MERCURY-FREE CERTIFIED</b></span>
+      <span class="ticker-item">SENTINEL<b>ONLINE · ALL CLEAR</b></span>
+      <span class="ticker-item">PORT OF NOUAKCHOTT<b>ZERO DELAYS</b></span>
+      <span class="ticker-item">SETTLEMENT<b>TRAD-FI + USDT/BTC</b></span>
+      <span class="ticker-item">AVAILABILITY<b>2.5 MT OPEN FOR ALLOCATION</b></span>
+      <span class="ticker-item">ESG STATUS<b>CERTIFIED · OECD COMPLIANT</b></span>
+      <span class="ticker-item">XAU/USD<b id="xau2">$3,124.50</b></span>
+      <span class="ticker-item">PIPELINE<b>1–5 MT / MONTH · ACTIVE</b></span>
+      <span class="ticker-item">GREEN GOLD<b>85% MERCURY-FREE CERTIFIED</b></span>
+      <span class="ticker-item">SENTINEL<b>ONLINE · ALL CLEAR</b></span>
+      <span class="ticker-item">PORT OF NOUAKCHOTT<b>ZERO DELAYS</b></span>
+      <span class="ticker-item">SETTLEMENT<b>TRAD-FI + USDT/BTC</b></span>
+      <span class="ticker-item">AVAILABILITY<b>2.5 MT OPEN FOR ALLOCATION</b></span>
+      <span class="ticker-item">ESG STATUS<b>CERTIFIED · OECD COMPLIANT</b></span>
+    </div>
+  </div>
+</div>
+
+<!-- Nav -->
+<nav>
+  <a href="#" class="nav-logo">
+    <div class="logo-diamond"></div>
+    <span class="logo-text">ATRA</span>
+  </a>
+  <ul class="nav-links">
+    <li><a href="#green-gold">Green Gold</a></li>
+    <li><a href="#process">The Process</a></li>
+    <li><a href="#settlement">Settlement</a></li>
+    <li><a href="portal/index.html" class="nav-cta">Sovereign Portal →</a></li>
+  </ul>
+</nav>
+
+<!-- Hero -->
+<section class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-grid"></div>
+
+  <p class="hero-tag">AFRICA TRADE & RESOURCES AGENCY · NOUAKCHOTT, MAURITANIA</p>
+
+  <h1 class="hero-h1">
+    The <em>Intelligence</em><br/>
+    Behind West African<br/>
+    Resource Trade
+  </h1>
+
+  <p class="hero-sub">
+    We are not brokers. We are the architects of secure, high-volume,
+    ESG-compliant trade corridors — connecting institutional demand
+    with verified African supply through an AI-driven 6-step framework.
+  </p>
+
+  <div class="hero-actions">
+    <a href="portal/index.html" class="btn-primary">
+      ◈ &nbsp; Request Private Briefing
+    </a>
+    <a href="#process" class="btn-outline">
+      View the Process →
+    </a>
+  </div>
+
+  <div class="hero-scroll">
+    <div class="scroll-line"></div>
+    SCROLL
+  </div>
+</section>
+
+<!-- Stats Bar -->
+<div class="stats-bar">
+  <div class="stat-cell fade-up">
+    <div class="stat-num">5<span class="stat-unit">MT</span></div>
+    <div class="stat-label">Monthly Gold Pipeline</div>
+  </div>
+  <div class="stat-cell fade-up">
+    <div class="stat-num">6</div>
+    <div class="stat-label">Step Secure-Close Process</div>
+  </div>
+  <div class="stat-cell fade-up">
+    <div class="stat-num">85<span class="stat-unit">%</span></div>
+    <div class="stat-label">Mercury-Free Certified</div>
+  </div>
+  <div class="stat-cell fade-up">
+    <div class="stat-num">3</div>
+    <div class="stat-label">West African Corridors</div>
+  </div>
+</div>
+
+<!-- Problem / Solution -->
+<section class="problem">
+  <div class="section-inner">
+    <p class="section-tag fade-up">THE CHALLENGE</p>
+    <h2 class="section-h2 fade-up">The <em>Wild West</em><br/>of African Trade</h2>
+    <p class="section-lead fade-up">
+      Every year, institutional buyers lose billions to unverified ghost brokers,
+      mercury-tainted supply chains, and logistics black holes.
+      ATRA was built to end that.
+    </p>
+
+    <div class="problem-grid">
+      <div class="problem-list fade-up">
+        <div class="problem-item">
+          <div class="problem-icon">⚠</div>
+          <div class="problem-text">
+            <h4>Ghost Broker Fraud</h4>
+            <p>Unverified intermediaries with no physical presence or supply access drain millions from institutional buyers annually.</p>
+          </div>
+        </div>
+        <div class="problem-item">
+          <div class="problem-icon">⚠</div>
+          <div class="problem-text">
+            <h4>Mercury-Tainted Supply Chains</h4>
+            <p>Artisanal gold processed with mercury fails EU ESG mandates and destroys institutional compliance ratings.</p>
+          </div>
+        </div>
+        <div class="problem-item">
+          <div class="problem-icon">⚠</div>
+          <div class="problem-text">
+            <h4>Logistics Black Holes</h4>
+            <p>No chain-of-custody. No GPS tracking. No customs pre-clearance. Cargo disappears for weeks.</p>
+          </div>
+        </div>
+        <div class="problem-item">
+          <div class="problem-icon">⚠</div>
+          <div class="problem-text">
+            <h4>Settlement Friction</h4>
+            <p>Incompatible banking systems, correspondent bank delays, and zero digital settlement options create costly bottlenecks.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="solution-box fade-up">
+        <h3>We Are the<br/>Trust Bridge.</h3>
+        <p>
+          ATRA's proprietary 6-step verification framework, AI agent team, and
+          on-the-ground intelligence in Mauritania, Mali, and Burkina Faso
+          eliminate every one of these risks before a single dollar moves.
+        </p>
+        <p>
+          Our Industry Blacklist has screened out over 40 fraudulent actors
+          this quarter alone. Our Green Gold Protocol has certified 85% of
+          our pipeline as mercury-free. Our dual-stream settlement supports
+          both traditional banking and USDT/BTC for instant finality.
+        </p>
+        <div class="solution-tags">
+          <span class="tag">VERIFIED PIPELINE</span>
+          <span class="tag">BLACKLIST PROTECTED</span>
+          <span class="tag">ESG CERTIFIED</span>
+          <span class="tag">DUAL SETTLEMENT</span>
+          <span class="tag">NCNDA SECURED</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Green Gold -->
+<section class="green-gold" id="green-gold">
+  <div class="section-inner">
+    <p class="section-tag fade-up">ESG PROTOCOL</p>
+    <h2 class="section-h2 fade-up">The <em>Green Gold</em><br/>Standard</h2>
+    <p class="section-lead fade-up">
+      We give institutional buyers a choice. Standard market gold — or a
+      certified, mercury-free supply stream that satisfies the world's
+      most demanding ESG mandates.
+    </p>
+
+    <div class="gg-grid">
+      <div class="fade-up">
+        <div class="gg-badge">
+          <div class="gg-dot"></div>
+          <span>GREEN GOLD PROTOCOL · ACTIVE</span>
+        </div>
+        <p style="font-size:15px;color:var(--text-mid);line-height:1.9;margin-bottom:28px;">
+          Our Alchemist Agent monitors every gram from origin mine to
+          port. Artisanal operators in the Mali and Burkina Faso interior
+          are transitioning to mechanical gravity separation — zero mercury,
+          full traceability, OECD-compliant chain of custody.
+        </p>
+
+        <table class="stream-table">
+          <thead>
+            <tr>
+              <th>STREAM</th>
+              <th>ESG STATUS</th>
+              <th>PREMIUM</th>
+              <th>TARGET</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>ATRA Green Gold</strong></td>
+              <td><span class="badge-green">CERTIFIED</span></td>
+              <td>+2–4%</td>
+              <td>EU / Sovereign</td>
+            </tr>
+            <tr>
+              <td>Standard Market</td>
+              <td><span class="badge-gold">STANDARD</span></td>
+              <td>LBMA</td>
+              <td>Industrial</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="gg-metrics fade-up">
+        <div class="gg-metric">
+          <span class="gg-metric-label">MERCURY USAGE</span>
+          <span class="gg-metric-val">0.0%</span>
+        </div>
+        <div class="gg-metric">
+          <span class="gg-metric-label">FAIR WAGE COMPLIANCE</span>
+          <span class="gg-metric-val">100%</span>
+        </div>
+        <div class="gg-metric">
+          <span class="gg-metric-label">CERTIFIED MINES</span>
+          <span class="gg-metric-val">85%</span>
+        </div>
+        <div class="gg-metric">
+          <span class="gg-metric-label">CHAIN OF CUSTODY</span>
+          <span class="gg-metric-val">Full</span>
+        </div>
+        <div class="gg-metric">
+          <span class="gg-metric-label">ASSAY VERIFICATION</span>
+          <span class="gg-metric-val">100%</span>
+        </div>
+        <div class="gg-metric">
+          <span class="gg-metric-label">OECD COMPLIANT</span>
+          <span class="gg-metric-val">Yes</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 6-Step Process -->
+<section class="process" id="process">
+  <div class="section-inner">
+    <p class="section-tag fade-up">TRANSACTION FRAMEWORK</p>
+    <h2 class="section-h2 fade-up">The 6-Step<br/><em>Secure-Close</em></h2>
+    <p class="section-lead fade-up">
+      Every deal — regardless of volume — moves through the same
+      sovereign-grade framework. No shortcuts. No exceptions.
+    </p>
+
+    <div class="steps-grid fade-up">
+      <div class="step-card">
+        <div class="step-n">01</div>
+        <div class="step-title">Consultation</div>
+        <div class="step-desc">Initial inquiry via Sovereign Portal. Allocation requirements assessed. Access key issued.</div>
+        <div class="step-agent">↳ SENTINEL</div>
+      </div>
+      <div class="step-card">
+        <div class="step-n">02</div>
+        <div class="step-title">Verification</div>
+        <div class="step-desc">Full KYC/AML review. POF validation. Proprietary Blacklist cross-reference. Digital footprint analysis.</div>
+        <div class="step-agent">↳ SENTINEL</div>
+      </div>
+      <div class="step-card">
+        <div class="step-n">03</div>
+        <div class="step-title">Negotiation</div>
+        <div class="step-desc">ESG stream selection. LBMA price mechanism. Volume and duration agreement. Purity specs confirmed.</div>
+        <div class="step-agent">↳ ALCHEMIST</div>
+      </div>
+      <div class="step-card">
+        <div class="step-n">04</div>
+        <div class="step-title">Documentation</div>
+        <div class="step-desc">NCNDA, SPA, Agency Agreement generated. Commission protection locked. Digital signature executed.</div>
+        <div class="step-agent">↳ LOGOS</div>
+      </div>
+      <div class="step-card">
+        <div class="step-n">05</div>
+        <div class="step-title">Payment</div>
+        <div class="step-desc">DLC or USDT/BTC escrow activated. Funds locked pending delivery. Commission payout armed.</div>
+        <div class="step-agent">↳ VAULT</div>
+      </div>
+      <div class="step-card">
+        <div class="step-n">06</div>
+        <div class="step-title">Logistics</div>
+        <div class="step-desc">Armored transit. Customs pre-clearance. GPS tracking. Final assay. Proof of Shipment issued.</div>
+        <div class="step-agent">↳ NAVIGATOR</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Audiences -->
+<section class="audiences">
+  <div class="section-inner">
+    <p class="section-tag fade-up">GLOBAL PARTNERS</p>
+    <h2 class="section-h2 fade-up">Built for the<br/><em>World's Elite</em></h2>
+    <p class="section-lead fade-up">
+      Three continents. Three buyer profiles. One sovereign standard.
+    </p>
+
+    <div class="audience-tabs fade-up">
+      <button class="aud-tab active" onclick="showAudience('asia', this)">
+        <div class="aud-tab-region">ASIA · HK / SINGAPORE</div>
+        <div class="aud-tab-title">Institutional Hedges</div>
+      </button>
+      <button class="aud-tab" onclick="showAudience('europe', this)">
+        <div class="aud-tab-region">EUROPE · SWISS / LONDON</div>
+        <div class="aud-tab-title">ESG Refineries</div>
+      </button>
+      <button class="aud-tab" onclick="showAudience('me', this)">
+        <div class="aud-tab-region">MIDDLE EAST · DUBAI</div>
+        <div class="aud-tab-title">Rapid-Trade Desks</div>
+      </button>
+    </div>
+
+    <div class="audience-panels fade-up">
+      <!-- Asia -->
+      <div class="aud-panel active" id="panel-asia">
+        <div class="aud-content">
+          <h3 class="aud-hook">High-Volume Reserves.<br/><em>Verified at Source.</em></h3>
+          <p class="aud-body">
+            Asian institutional buyers require scale, speed, and an unimpeachable
+            chain of custody. ATRA's 1–5 MT monthly pipeline — already delivering
+            to a Tier-1 institutional partner — provides the sovereign-grade
+            verification infrastructure that family offices and sovereign funds demand.
+          </p>
+          <ul class="aud-points">
+            <li>1–5 MT monthly offtake with revolving DLC structure</li>
+            <li>Dual-stream: Traditional bank transfer or USDT/BTC</li>
+            <li>72-hour Nouakchott to Hong Kong/Dubai corridor</li>
+            <li>Full NCNDA — identity and terms protected absolutely</li>
+          </ul>
+        </div>
+        <div class="aud-visual">
+          <div class="aud-stat-big">5MT</div>
+          <div class="aud-stat-label">MONTHLY CAPACITY</div>
+          <div class="aud-stat-big" style="color:var(--green);font-size:40px;">72hr</div>
+          <div class="aud-stat-label">NOUAKCHOTT → HK TRANSIT</div>
+        </div>
+      </div>
+
+      <!-- Europe -->
+      <div class="aud-panel" id="panel-europe">
+        <div class="aud-content">
+          <h3 class="aud-hook">The Only <em>Certified</em><br/>Mercury-Free Stream.</h3>
+          <p class="aud-body">
+            European refineries face increasingly strict OECD and EU supply chain
+            transparency requirements. ATRA's Green Gold Protocol is the only
+            certified mercury-free artisanal gold stream from West Africa, giving
+            EU-regulated institutions the compliant supply they need.
+          </p>
+          <ul class="aud-points">
+            <li>Mercury: 0.0% — independently verified per batch</li>
+            <li>OECD Due Diligence Guidance fully compliant</li>
+            <li>Premium ESG stream available at +2–4% over LBMA</li>
+            <li>Full ESG audit trail from mine to refinery</li>
+          </ul>
+        </div>
+        <div class="aud-visual">
+          <div class="aud-stat-big" style="color:var(--green);">0%</div>
+          <div class="aud-stat-label">MERCURY USAGE</div>
+          <div class="aud-stat-big">+4%</div>
+          <div class="aud-stat-label">ESG PREMIUM OVER LBMA</div>
+        </div>
+      </div>
+
+      <!-- Middle East -->
+      <div class="aud-panel" id="panel-me">
+        <div class="aud-content">
+          <h3 class="aud-hook">Liquidity. Speed.<br/><em>Zero Friction.</em></h3>
+          <p class="aud-body">
+            Dubai rapid-trade desks need counterparties who can move. ATRA's
+            dual-stream settlement — traditional DLC and instant USDT/BTC — combined
+            with our pre-cleared Nouakchott export corridor means you can close
+            a spot trade and have cargo in transit within 48 hours of contract.
+          </p>
+          <ul class="aud-points">
+            <li>USDT (ERC-20/TRC-20) and BTC — instant finality</li>
+            <li>250kg–500kg spot trial available immediately</li>
+            <li>Pre-cleared customs — Port of Nouakchott priority lane</li>
+            <li>Dubai Free Zone delivery with armored final mile</li>
+          </ul>
+        </div>
+        <div class="aud-visual">
+          <div class="aud-stat-big">48hr</div>
+          <div class="aud-stat-label">CONTRACT TO CARGO IN TRANSIT</div>
+          <div class="aud-stat-big" style="font-size:36px;">USDT</div>
+          <div class="aud-stat-label">INSTANT DIGITAL SETTLEMENT</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Settlement -->
+<section class="settlement" id="settlement">
+  <div class="section-inner">
+    <p class="section-tag fade-up">FINANCIAL ARCHITECTURE</p>
+    <h2 class="section-h2 fade-up">Old World Security.<br/><em>New World Speed.</em></h2>
+    <p class="section-lead fade-up">
+      We are the only West African commodity desk supporting full
+      traditional banking infrastructure and digital asset settlement simultaneously.
+    </p>
+
+    <div class="settle-grid fade-up">
+      <div class="settle-card">
+        <div class="settle-type">TRADITIONAL STREAM</div>
+        <h3 class="settle-title">Institutional<br/>Banking</h3>
+        <ul class="settle-items">
+          <li><span class="settle-dot"></span>Irrevocable Documentary Letter of Credit (DLC)</li>
+          <li><span class="settle-dot"></span>MT700 / MT760 SWIFT Instructions</li>
+          <li><span class="settle-dot"></span>Bank-to-Bank MT103 Wire Transfer</li>
+          <li><span class="settle-dot"></span>Third-Party Escrow Arrangements</li>
+          <li><span class="settle-dot"></span>Bank Guarantee / SBLC Structures</li>
+          <li><span class="settle-dot"></span>Revolving DLC for Long-Term Offtake</li>
+        </ul>
+      </div>
+      <div class="settle-card" style="border-left:1px solid var(--gold-line);">
+        <div class="settle-type">DIGITAL STREAM</div>
+        <h3 class="settle-title">Sovereign<br/>Digital Assets</h3>
+        <ul class="settle-items">
+          <li><span class="settle-dot"></span>USDT Tether — ERC-20 (Ethereum)</li>
+          <li><span class="settle-dot"></span>USDT Tether — TRC-20 (Tron)</li>
+          <li><span class="settle-dot"></span>BTC (Bitcoin) — Native Protocol</li>
+          <li><span class="settle-dot"></span>Multi-Signature Escrow Wallets</li>
+          <li><span class="settle-dot"></span>Release Triggered by Navigator POS</li>
+          <li><span class="settle-dot"></span>Near-Instant Cross-Border Finality</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section">
+  <div class="cta-inner">
+    <p class="section-tag fade-up" style="justify-content:center;">SOVEREIGN ACCESS</p>
+    <h2 class="cta-h2 fade-up">
+      We Don't Speculate.<br/>
+      We <em>Execute.</em>
+    </h2>
+    <p class="cta-sub fade-up">
+      Due to the exclusive nature of our Green Gold streams and
+      blacklist-vetted supply, we invite qualified institutional buyers
+      to request a private allocation briefing. 50% of 2026 capacity
+      is already committed.
+    </p>
+    <div class="cta-buttons fade-up">
+      <a href="portal/index.html" class="btn-primary">
+        ◈ &nbsp; Request Private Briefing
+      </a>
+      <a href="portal/index.html" class="btn-outline">
+        Enter Sovereign Portal →
+      </a>
+    </div>
+    <div class="cta-contact fade-up">
+      <div>PRINCIPAL · M. DIALLO</div>
+      <div><a href="mailto:m.diallo@atrasarl.com">m.diallo@atrasarl.com</a></div>
+      <div><a href="tel:+22244290990">+222-44290990</a> &nbsp;·&nbsp; <a href="tel:+22241745940">+222-41745940</a></div>
+      <div><a href="https://www.atrasarl.com">www.atrasarl.com</a></div>
+    </div>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer>
+  <div class="footer-logo">
+    <div class="logo-diamond" style="width:20px;height:20px;"></div>
+    <span class="logo-text" style="font-size:11px;">ATRA</span>
+  </div>
+  <div class="footer-tagline">"Connecting African Resources to Global Markets."</div>
+  <div class="footer-copy">© 2026 AFRICA TRADE & RESOURCES AGENCY · NOUAKCHOTT, MAURITANIA</div>
+</footer>
+
+<script>
+  // Audience tabs
+  function showAudience(id, btn) {
+    document.querySelectorAll('.aud-panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.aud-tab').forEach(t => t.classList.remove('active'));
+    document.getElementById('panel-' + id).classList.add('active');
+    btn.classList.add('active');
+  }
+
+  // Fade-up on scroll
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+  }, { threshold: 0.1 });
+  document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
+
+  // Live gold price
+  let price = 3124.50;
+  function tickPrice() {
+    price += (Math.random() - 0.48) * 0.9;
+    const f = '$' + price.toFixed(2);
+    document.getElementById('xau').textContent = f;
+    document.getElementById('xau2').textContent = f;
+  }
+  setInterval(tickPrice, 4500);
+</script>
+
+</body>
+</html>
